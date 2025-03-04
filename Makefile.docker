@@ -1,0 +1,72 @@
+# Docker 빌드 작업을 위한 Makefile
+# 'make' 또는 'make help'를 실행하여 사용 가능한 명령어 확인
+
+# 변수 설정
+IMAGE_NAME = janus-gateway
+IMAGE_TAG ?= latest
+REGISTRY ?= picpico-labs
+FULL_IMAGE_NAME = $(REGISTRY)/$(IMAGE_NAME):$(IMAGE_TAG)
+
+# 기본 명령 (make 실행 시)
+.PHONY: help
+help:
+	@echo "Janus Gateway Docker helper"
+	@echo ""
+	@echo "사용법:"
+	@echo "  make -f Makefile.docker docker-build       - Docker 이미지 빌드"
+	@echo "  make -f Makefile.docker docker-tag         - Git 커밋 해시로 이미지 태그 지정"
+#	@echo "  make -f Makefile.docker docker-push        - 이미지를 Docker Hub에 푸시"
+	@echo "  make -f Makefile.docker docker-run         - Janus Gateway 컨테이너 실행"
+	@echo "  make -f Makefile.docker docker-run-daemon  - 컨테이너 백그라운드 실행"
+	@echo "  make -f Makefile.docker docker-dev         - 소스 마운트된 개발 컨테이너 실행"
+	@echo "  make -f Makefile.docker docker-clean       - Docker 이미지 제거"
+	@echo ""
+	@echo "환경 변수:"
+	@echo "  IMAGE_TAG - 이미지 태그 (기본값: latest)"
+	@echo "  REGISTRY  - 레지스트리 이름 (기본값: picpic-labs)"
+
+# Docker 이미지 빌드
+.PHONY: docker-build
+docker-build:
+	docker build -t $(FULL_IMAGE_NAME) .
+
+# Docker 이미지 태그 지정 (버전 태그 추가)
+.PHONY: docker-tag
+docker-tag: docker-build
+	docker tag $(FULL_IMAGE_NAME) $(REGISTRY)/$(IMAGE_NAME):$(shell git rev-parse --short HEAD)
+
+# Docker 이미지 푸시 (Docker Hub 등에)
+# .PHONY: docker-push
+# docker-push: docker-tag
+# 	docker push $(FULL_IMAGE_NAME)
+# 	docker push $(REGISTRY)/$(IMAGE_NAME):$(shell git rev-parse --short HEAD)
+
+# Docker 컨테이너 실행
+.PHONY: docker-run
+docker-run: docker-build
+	docker run -p 8088:8088 -p 8089:8089 -p 10000-10010:10000-10010/udp $(FULL_IMAGE_NAME)
+
+# Docker 컨테이너 백그라운드 실행
+.PHONY: docker-run-daemon
+docker-run-daemon: docker-build
+	docker run -d -p 8088:8088 -p 8089:8089 -p 10000-10010:10000-10010/udp $(FULL_IMAGE_NAME)
+
+# 개발용 이미지 빌드 (builder 스테이지까지만)
+.PHONY: docker-build-dev
+docker-build-dev:
+	docker build -t $(FULL_IMAGE_NAME)-dev --target builder .
+
+# 개발용 컨테이너 실행 (소스 볼륨 마운트)
+.PHONY: docker-dev
+docker-dev: docker-build-dev
+	docker run -it --rm -v $(PWD):/opt/janus-gateway -p 8088:8088 -p 8089:8089 $(FULL_IMAGE_NAME)-dev /bin/bash
+
+# Docker 이미지 및 빌드 캐시 정리
+.PHONY: docker-clean
+docker-clean:
+	docker rmi $(FULL_IMAGE_NAME) || true
+	docker rmi $(REGISTRY)/$(IMAGE_NAME):$(shell git rev-parse --short HEAD) || true
+	docker rmi $(FULL_IMAGE_NAME)-dev || true
+
+# 이것을 기본 타겟으로 설정
+.DEFAULT_GOAL := help
