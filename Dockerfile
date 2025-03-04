@@ -44,6 +44,7 @@ ENV PATH="/opt/janus/bin:$PATH"
 
 # 포트 개방
 EXPOSE 8088 8089 8188 8189 10000-10010/udp
+EXPOSE 8000 
 
 # 실행 명령어
 CMD ["janus"]
