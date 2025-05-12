@@ -10,6 +10,7 @@ RUN apt update && apt install -y \
     libnice-dev \
     git \
     wget \
+    libwebsockets-dev \
     && rm -rf /var/lib/apt/lists/*
 
 # 작업 디렉토리 설정
@@ -34,6 +35,7 @@ RUN apt update && apt install -y \
     libsofia-sip-ua0 libglib2.0-0 libopus0 libogg0 \
     libcurl4 liblua5.3-0 libconfig9 \ 
     libnice10 \
+    libwebsockets16 \
     && rm -rf /var/lib/apt/lists/*
 
 # 컴파일된 바이너리와 설정 파일만 복사
