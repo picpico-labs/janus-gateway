@@ -33,7 +33,7 @@ FROM ubuntu:22.04
 RUN apt update && apt install -y \
     libmicrohttpd12 libjansson4 libssl3 libsrtp2-1 \
     libsofia-sip-ua0 libglib2.0-0 libopus0 libogg0 \
-    libcurl4 liblua5.3-0 libconfig9 \ 
+    libcurl4 liblua5.3-0 libconfig9 \
     libnice10 \
     libwebsockets16 \
     && rm -rf /var/lib/apt/lists/*
@@ -45,8 +45,8 @@ COPY --from=builder /opt/janus /opt/janus
 ENV PATH="/opt/janus/bin:$PATH"
 
 # 포트 개방
-EXPOSE 8088 8089 8188 8189 10000-10010/udp
-EXPOSE 8000 
+EXPOSE 8088 8089 8188 8989 10000-10010/udp
+EXPOSE 8000
 
 # 실행 명령어
 CMD ["janus"]
