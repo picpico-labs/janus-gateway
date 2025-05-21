@@ -46,12 +46,12 @@ docker-tag: docker-build
 # Docker 컨테이너 실행
 .PHONY: docker-run
 docker-run: docker-build
-	docker run --name $(CONTAINER_NAME) -p 8088:8088 -p 8089:8089 -p 8000:8000 -p 8188:8188 -p 8189:8189 -p 10000-10010:10000-10010/udp $(FULL_IMAGE_NAME)
+	docker run --name $(CONTAINER_NAME) -p 8088:8088 -p 8089:8089 -p 8000:8000 -p 8188:8188 -p 8989:8989 -p 10000-10010:10000-10010/udp $(FULL_IMAGE_NAME)
 
 # Docker 컨테이너 백그라운드 실행
 .PHONY: docker-run-daemon
 docker-run-daemon: docker-build
-	docker run -d --name $(CONTAINER_NAME) -p 8088:8088 -p 8089:8089 -p 8000:8000 -p 8188:8188 -p 8189:8189 -p 10000-10010:10000-10010/udp $(FULL_IMAGE_NAME)
+	docker run -d --name $(CONTAINER_NAME) -p 8088:8088 -p 8089:8089 -p 8000:8000 -p 8188:8188 -p 8989:8989 -p 10000-10010:10000-10010/udp $(FULL_IMAGE_NAME)
 
 # 개발용 이미지 빌드 (builder 스테이지까지만)
 .PHONY: docker-build-dev
@@ -61,7 +61,7 @@ docker-build-dev:
 # 개발용 컨테이너 실행 (소스 볼륨 마운트)
 .PHONY: docker-dev
 docker-dev: docker-build-dev
-	docker run -it --name $(CONTAINER_NAME)-dev --rm -v $(PWD):/opt/janus-gateway -p 8088:8088 -p 8089:8089 -p 8188:8188 -p 8189:8189 $(FULL_IMAGE_NAME)-dev /bin/bash
+	docker run -it --name $(CONTAINER_NAME)-dev --rm -v $(PWD):/opt/janus-gateway -p 8088:8088 -p 8089:8089 -p 8188:8188 -p 8989:8989 $(FULL_IMAGE_NAME)-dev /bin/bash
 
 # Docker 이미지 및 빌드 캐시 정리
 .PHONY: docker-clean
